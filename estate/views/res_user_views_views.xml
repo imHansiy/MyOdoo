@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- View res_user_views View Tree -->
+    <record id="view_res_user_views_tree" model="ir.ui.view">
+        <field name="name">view.res_user_views.tree</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <page position="after" name="preferences">
+                <page string="我的资产">
+                    <field name="property_ids" widget="many2many_list" />
+                </page>
+            </page>
+        </field>
+    </record>
+</odoo>

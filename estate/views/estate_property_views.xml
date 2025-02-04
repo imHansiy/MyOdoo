@@ -1,0 +1,140 @@
+<odoo>
+    <record model="ir.actions.act_window" id="estate_property_views">
+        <field name="name">房屋信息</field>
+        <field name="res_model">estate.property</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="context">{'search_default_available':True}</field>
+    </record>
+
+    <record id="estate_property_custom_tree_views" model="ir.ui.view">
+        <field name="name">estate_property_custom_tree_views</field>
+        <field name="model">estate.property</field>
+        <field name="arch" type="xml">
+            <tree default_order="id desc" decoration-success="state in ['offer_received', 'offer_accepted']" 
+                decoration-bf="state in ['offer_received']"
+                decoration-muted="state in ['sold']"
+
+            >
+                <field name="state"/>
+                <field name="name"/>
+                <field name="postcode"/>
+                <field name="bedrooms"/>
+                <field name="living_area"/>
+                <field name="expected_price"/>
+                <field name="selling_price"/>
+                <field name="date_availability" optional="False"/>
+                <field name="property_type_id"/>
+                <field name="buyer_id"/>
+                <field name="seller_id"/>
+
+            </tree>
+        </field>
+    </record>
+
+    <record id="estate_property_custom_from_views" model="ir.ui.view">
+        <field name="name">estate_property_custom_from_views</field>
+        <field name="model">estate.property</field>
+        <field name="arch" type="xml">
+            <form >
+                <header>
+                        <button name="action_sold" string="售出" type="object"  class="btn-primary"/>
+                        <button name="action_cancel" string="取消" type="object" class="btn-danger"/>
+                        <field name="state" widget="statusbar" statusbar_visible="new,offer_received,offer_accepted,sold"/>
+                </header>
+                <sheet>
+                    <h1><field name="name"/></h1>
+                    <!-- 添加房屋标签 -->
+                    <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                    <group>
+                        <group>
+                            <field name="state"/>
+                            <field name="property_type_id" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="postcode"/>
+                            <field name="date_availability"/>
+                        </group>
+                        <group>
+                            <field name="expected_price"/>
+                            <field name="best_price"/>
+                            <field name="selling_price"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <group>
+                                <field name="description"/>
+                                <field name="bedrooms"/>
+                                <field name="living_area"/>
+                                <field name="facades"/>
+                                <field name="garage"/>
+                                <field name="garden"/>
+                                <field name="garden_area" invisible="not garden"/>
+                                <field name="garden_orientation" invisible="not garden"/>
+                                <field name="total_area"/>
+                            </group>
+                        </page>
+                        <page string="Other">
+                            <group>
+                                <field name="buyer_id"/>
+                                <field name="seller_id"/>
+                            </group>
+                        </page>
+                         <page string="Offers">
+                            <group>
+                                <field name="offer_ids" widget="one2many_list" readonly="state in ['offer_received', 'offer_accepted', 'sold']"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="estate_property_custom_search_views" model="ir.ui.view">
+        <field name="name">estate_property_custom_search_views</field>
+        <field name="model">estate.property</field>
+        <field name="arch" type="xml">
+            <search string="Property Search">
+                <field name="name" />
+                <field name="postcode"/>
+                <field name="expected_price" />
+                <field name="bedrooms" />
+                <field name="living_area" string="面积至少为：" filter_domain="[('living_area', '>=', self)]" />
+                <field name="facades"/>
+                <separator/>
+                <filter string="可用的" name="available" domain="[('state', '=', 'new'), ('state', '=', 'offer_received')]"/>
+                <group expand="1" string="Group By">
+                    <filter string="邮编" name="postcode" context="{'group_by': 'postcode'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="estate_property_custom_kanban_views" model="ir.ui.view">
+        <field name="name">estate_property_custom_kanban_views</field>
+        <field name="model">estate.property</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="property_type_id" records_draggable="False">
+                <field name="state"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <h3><field name="name"/></h3>
+                            <p>
+                                期望价格：<field name="expected_price"/>
+                            </p>
+                            <p t-if="record.state.raw_value == 'offer_received'">
+                                最佳价格：<field name="best_price" />
+                            </p>
+                            <p t-if="record.state.raw_value == 'offer_accepted'">
+                                销售价格：<field name="selling_price" />
+                            </p>
+                            <p>
+                                房屋标签：<field name="tag_ids"/>
+                            </p>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+</odoo>
